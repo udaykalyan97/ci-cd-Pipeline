@@ -1,0 +1,196 @@
+Parameters:
+  GitHubOAuthToken:
+    Type: String
+    Description: "GitHub OAuth token for accessing the repository"
+  GitHubUsername:
+    Type: String
+    Description: "GitHub username"
+  RepositoryName:
+    Type: String
+    Description: "GitHub repository name"
+  ReactAppBucketName:
+    Type: String
+    Description: "S3 bucket name for the React app"
+  ArtifactBucketName:
+    Type: String
+    Description: "S3 bucket name for build artifacts"
+
+Resources:
+  CodePipeline:
+    Type: AWS::CodePipeline::Pipeline
+    Properties:
+      Name: FrontendPipeline
+      RoleArn: !GetAtt CodePipelineServiceRole.Arn  # Role for CodePipeline to perform actions
+      ArtifactStore:
+        Type: S3
+        Location: !Ref ArtifactBucketName
+      Stages:
+        - Name: Source
+          Actions:
+            - Name: GitHub
+              ActionTypeId:
+                Category: Source
+                Owner: AWS
+                Version: 1
+                Provider: GitHub
+              OutputArtifacts:
+                - Name: SourceOutput
+              Configuration:
+                Owner: !Ref GitHubUsername
+                Repo: !Ref RepositoryName
+                Branch: main
+                OAuthToken: !Ref GitHubOAuthToken
+        - Name: Build
+          Actions:
+            - Name: CodeBuild
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Version: 1
+                Provider: CodeBuild
+              InputArtifacts:
+                - Name: SourceOutput
+              OutputArtifacts:
+                - Name: BuildOutput
+              Configuration:
+                ProjectName: !Ref CodeBuildProject
+        - Name: Deploy
+          Actions:
+            - Name: S3Deploy
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# SourceRepository:
+#   Type: AWS::CodePipeline::Source
+#   Properties:
+#     Name: GitHubSource
+#     ArtifactStore:
+#       Type: S3
+#       Location: Artifact-bucket
+#     SourceAction:
+#       ActionTypeId:
+#         Category: Source
+#         Owner: AWS
+#         Version: 1
+#         Provider: GitHub
+#       OutputArtifacts:
+#         - Name: SourceOutput
+#       Configuration:
+#         Owner: your-github-username
+#         Repo: your-repository-name
+#         Branch: main  # The branch to monitor
+#         OAuthToken: !Ref GitHubOAuthToken  # Ref to a parameter that stores your GitHub OAuth token
+
+
+
+
+# CodeBuildProject:
+#   Type: AWS::CodeBuild::Project
+#   Properties:
+#     Name: frontend-react-build
+#     Environment:
+#       ComputeType: BUILD_GENERAL1_SMALL
+#       Image: aws/codebuild/standard:5.0
+#       Type: LINUX_CONTAINER
+#     ServiceRole: !GetAtt FrontendCodeBuildRole.Arn
+#     Artifacts:
+#       Type: S3
+#       Location: your-react-app-bucket-name
+#     Source:
+#       Type: CODEPIPELINE
+#     BuildSpec: |
+#       version: 0.2
+#       phases:
+#         install:
+#           commands:
+#             - npm install
+#         build:
+#           commands:
+#             - npm run build
+#         post_build:
+#           commands:
+#             - npm run test
+#             - aws s3 sync build/ s3://your-react-app-bucket-name/
+
+
+            
+
+# CodePipeline:
+#   Type: AWS::CodePipeline::Pipeline
+#   Properties:
+#     Name: FrontendPipeline
+#     RoleArn: !GetAtt CodePipelineServiceRole.Arn  # Role for CodePipeline to perform actions
+#     ArtifactStore:
+#       Type: S3
+#       Location: Artifact-bucket
+#     Stages:
+#       - Name: Source
+#         Actions:
+#           - Name: GitHub
+#             ActionTypeId:
+#               Category: Source
+#               Owner: AWS
+#               Version: 1
+#               Provider: GitHub
+#             OutputArtifacts:
+#               - Name: SourceOutput
+#             Configuration:
+#               Owner: your-github-username
+#               Repo: your-repository-name
+#               Branch: main
+#               OAuthToken: !Ref GitHubOAuthToken
+#       - Name: Build
+#         Actions:
+#           - Name: CodeBuild
+#             ActionTypeId:
+#               Category: Build
+#               Owner: AWS
+#               Version: 1
+#               Provider: CodeBuild
+#             InputArtifacts:
+#               - Name: SourceOutput
+#             OutputArtifacts:
+#               - Name: BuildOutput
+#             Configuration:
+#               ProjectName: !Ref CodeBuildProject
+#       - Name: Deploy
+#         Actions:
+#           - Name: S3Deploy
+#             ActionTypeId:
+#               Category: Deploy
+#               Owner: AWS
+#               Version: 1
+#               Provider: S3
+#             InputArtifacts:
+#               - Name: BuildOutput
+#             Configuration:
+#               BucketName: your-react-app-bucket-name
+#               Extract: true
