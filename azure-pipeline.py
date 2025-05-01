@@ -4,7 +4,7 @@ import time
 
 # AWS Configurations
 AWS_REGION = "us-east-1"
-BUCKET_NAME = "your-unique-bucket-name-123456"
+BUCKET_NAME = "bucket-name"
 CLOUDFRONT_COMMENT = "Static Website CloudFront Distribution"
 
 # Create AWS clients
