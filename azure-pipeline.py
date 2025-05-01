@@ -1,6 +1,15 @@
 import boto3
 import json
 import time
+import os
+
+# AWS Credentials
+def set_aws_credentials(access_key, secret_key, region):
+    os.environ["AWS_ACCESS_KEY_ID"] = access_key
+    os.environ["AWS_SECRET_ACCESS_KEY"] = secret_key
+    os.environ["AWS_DEFAULT_REGION"] = region
+    print("✅ AWS credentials set for this session.")
+
 
 # AWS Configurations
 AWS_REGION = "us-east-1"
@@ -86,6 +95,14 @@ def create_cloudfront_distribution():
     return distribution_id, domain_name
 
 if __name__ == "__main__":
+
+    # Set credentials before making any boto3 calls
+    set_aws_credentials(
+        access_key="YOUR_ACCESS_KEY",
+        secret_key="YOUR_SECRET_KEY",
+        region=AWS_REGION
+    )
+
     create_s3_bucket()
     configure_static_website()
     set_bucket_policy_public()
