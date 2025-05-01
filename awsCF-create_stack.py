@@ -37,7 +37,7 @@ try:
     print_success("✅ Stack creation initiated.")
 
     # Wait for the stack to complete
-    print_info("⏳ Waiting for stack creation to complete (this may take a few minutes)...")
+    print_info("⏳ Waiting for stack creation to complete...")
     waiter = cf.get_waiter('stack_create_complete')
     waiter.wait(StackName='frontend-pipeline')
 

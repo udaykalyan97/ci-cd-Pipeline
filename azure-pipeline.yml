@@ -1,0 +1,91 @@
+trigger:
+  branches:
+    include:
+      - main  # Trigger on pushes to the 'main' branch
+
+pool:
+  vmImage: 'ubuntu-latest'  # Use Microsoft-hosted Ubuntu agent
+
+variables:
+  AWS_REGION: 'us-east-1'                     # Your AWS region
+  S3_BUCKET_NAME: 'unique-s3-bucket-name'     # Your S3 bucket name
+
+stages:
+  # Install Stage
+  - stage: Install
+    displayName: 'Install Dependencies'
+    jobs:
+      - job: InstallJob
+        steps:
+          - task: NodeTool@0
+            inputs:
+              versionSpec: '18.x'    # Specify Node.js version
+            displayName: 'Install Node.js'
+
+          - script: |
+              npm install
+            displayName: 'Install npm packages'
+
+  # Build Stage
+  - stage: Build
+    displayName: 'Build React Application'
+    dependsOn: Install
+    jobs:
+      - job: BuildJob
+        steps:
+          - script: |
+              npm run build
+            displayName: 'Build React app'
+
+  # Test Stage
+  - stage: Test
+    displayName: 'Run Tests'
+    dependsOn: Build
+    jobs:
+      - job: TestJob
+        steps:
+          - script: |
+              npm test -- --coverage
+            displayName: 'Run React tests'
+
+  # Deploy Stage
+  - stage: Deploy
+    displayName: 'Create S3 Bucket, CloudFront, and Upload to S3'
+    dependsOn: Test
+    jobs:
+      - job: DeployJob
+        steps:
+          # Create S3 Bucket if it doesn't exist
+          - script: |
+              aws s3api head-bucket --bucket $(S3_BUCKET_NAME) || aws s3 mb s3://$(S3_BUCKET_NAME) --region $(AWS_REGION)
+            displayName: 'Create S3 Bucket if it doesn\'t exist'
+
+          # Create CloudFront Distribution if it doesn't exist
+          - script: |
+              distribution_id=$(aws cloudfront list-distributions --query "DistributionList.Items[?Origins.Items[?DomainName=='$(S3_BUCKET_NAME).s3.amazonaws.com']].Id | [0]" --output text)
+              if [ "$distribution_id" == "None" ]; then
+                # Create CloudFront Distribution
+                distribution_id=$(aws cloudfront create-distribution --origin-domain-name $(S3_BUCKET_NAME).s3.amazonaws.com --default-root-object index.html --query "Distribution.Id" --output text)
+                echo "Created CloudFront Distribution with ID: $distribution_id"
+              else
+                echo "CloudFront Distribution already exists with ID: $distribution_id"
+              fi
+            displayName: 'Create CloudFront Distribution if it doesn\'t exist'
+
+          # Upload build folder to S3
+          - task: AwsCli@1
+            inputs:
+              awsCredentials: 'aws-service-connection'  # AWS service connection set up in Azure DevOps
+              regionName: '$(AWS_REGION)'
+              command: 's3'
+              arguments: 'sync build/ s3://$(S3_BUCKET_NAME) --delete'
+            displayName: 'Upload build to S3'
+
+          # Invalidate CloudFront Cache
+          - task: AwsCli@1
+            inputs:
+              awsCredentials: 'aws-service-connection'
+              regionName: '$(AWS_REGION)'
+              command: 'cloudfront'
+              arguments: 'create-invalidation --distribution-id $(distribution_id) --paths "/*"'
+            displayName: 'Invalidate CloudFront Cache'

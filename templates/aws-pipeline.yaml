@@ -62,32 +62,6 @@ Resources:
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # SourceRepository:
 #   Type: AWS::CodePipeline::Source
 #   Properties:
