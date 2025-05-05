@@ -1,0 +1,94 @@
+{
+    "StackResources": [
+        {
+            "StackName": "my-main-stack",
+            "StackId": "arn:aws:cloudformation:us-east-1:000000000000:stack/my-main-stack/72980e8f",
+            "LogicalResourceId": "S3Stack",
+            "ResourceType": "AWS::CloudFormation::Stack",
+            "Timestamp": "2025-05-05T04:12:49.179000+00:00",
+            "ResourceStatus": "UPDATE_IN_PROGRESS",
+            "DriftInformation": {
+                "StackResourceDriftStatus": "NOT_CHECKED"
+            }
+        },
+        {
+            "StackName": "my-main-stack",
+            "StackId": "arn:aws:cloudformation:us-east-1:000000000000:stack/my-main-stack/72980e8f",
+            "LogicalResourceId": "EC2Stack",
+            "ResourceType": "AWS::CloudFormation::Stack",
+            "Timestamp": "2025-05-05T04:12:49.179000+00:00",
+            "ResourceStatus": "UPDATE_IN_PROGRESS",
+            "DriftInformation": {
+                "StackResourceDriftStatus": "NOT_CHECKED"
+            }
+        },
+        {
+            "StackName": "my-main-stack",
+            "StackId": "arn:aws:cloudformation:us-east-1:000000000000:stack/my-main-stack/72980e8f",
+            "LogicalResourceId": "RDSStack",
+            "ResourceType": "AWS::CloudFormation::Stack",
+            "Timestamp": "2025-05-05T04:12:49.179000+00:00",
+            "ResourceStatus": "UPDATE_IN_PROGRESS",
+            "DriftInformation": {
+                "StackResourceDriftStatus": "NOT_CHECKED"
+            }
+        },
+        {
+            "StackName": "my-main-stack",
+            "StackId": "arn:aws:cloudformation:us-east-1:000000000000:stack/my-main-stack/72980e8f",
+            "LogicalResourceId": "LambdaStack",
+            "ResourceType": "AWS::CloudFormation::Stack",
+            "Timestamp": "2025-05-05T04:12:49.179000+00:00",
+            "ResourceStatus": "UPDATE_IN_PROGRESS",
+            "DriftInformation": {
+                "StackResourceDriftStatus": "NOT_CHECKED"
+            }
+        },
+        {
+            "StackName": "my-main-stack",
+            "StackId": "arn:aws:cloudformation:us-east-1:000000000000:stack/my-main-stack/72980e8f",
+            "LogicalResourceId": "CloudFrontStack",
+            "ResourceType": "AWS::CloudFormation::Stack",
+            "Timestamp": "2025-05-05T04:12:49.179000+00:00",
+            "ResourceStatus": "UPDATE_IN_PROGRESS",
+            "DriftInformation": {
+                "StackResourceDriftStatus": "NOT_CHECKED"
+            }
+        },
+        {
+            "StackName": "my-main-stack",
+            "StackId": "arn:aws:cloudformation:us-east-1:000000000000:stack/my-main-stack/72980e8f",
+            "LogicalResourceId": "Route53Stack",
+            "ResourceType": "AWS::CloudFormation::Stack",
+            "Timestamp": "2025-05-05T04:12:49.179000+00:00",
+            "ResourceStatus": "UPDATE_IN_PROGRESS",
+            "DriftInformation": {
+                "StackResourceDriftStatus": "NOT_CHECKED"
+            }
+        }
+    ]
+}
+2025-05-05 09:00:30 hosted-bucket
+2025-05-05 09:35:18 myproject-frontend-dev
+2025-05-05 09:35:18 myproject-frontend-staging
+2025-05-05 09:35:18 myproject-frontend-uat
+2025-05-05 09:35:18 myproject-frontend-prod
+
+
+
+{
+    "Reservations": []
+}
+
+
+
+
+{
+    "Functions": []
+}
+
+
+
+{
+    "HostedZones": []
+}

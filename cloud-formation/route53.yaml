@@ -1,0 +1,61 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Route 53 records for dev, staging, uat, and prod environments.
+
+Parameters:
+  ProjectDomain:
+    Type: String
+    Description: The root domain name (e.g., example.com)
+  
+  HostedZoneId:
+    Type: String
+    Description: The Route 53 Hosted Zone ID for the domain
+
+Resources:
+  DevRecordSet:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref HostedZoneId
+      Name: !Sub "dev.${ProjectDomain}"
+      Type: A
+      AliasTarget:
+        DNSName: !ImportValue DevCloudFrontDNSName
+        HostedZoneId: Z2FDTNDATAQYW2  # CloudFront hosted zone ID (global)
+
+  StagingRecordSet:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref HostedZoneId
+      Name: !Sub "staging.${ProjectDomain}"
+      Type: A
+      AliasTarget:
+        DNSName: !ImportValue StagingCloudFrontDNSName
+        HostedZoneId: Z2FDTNDATAQYW2
+
+  UATRecordSet:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref HostedZoneId
+      Name: !Sub "uat.${ProjectDomain}"
+      Type: A
+      AliasTarget:
+        DNSName: !ImportValue UATCloudFrontDNSName
+        HostedZoneId: Z2FDTNDATAQYW2
+
+  ProdRecordSet:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref HostedZoneId
+      Name: !Sub "www.${ProjectDomain}"
+      Type: A
+      AliasTarget:
+        DNSName: !ImportValue ProdCloudFrontDNSName
+        HostedZoneId: Z2FDTNDATAQYW2
+
+Outputs:
+  DevRecordName:
+    Description: Dev subdomain
+    Value: !Sub "dev.${ProjectDomain}"
+
+  ProdRecordName:
+    Description: Production subdomain
+    Value: !Sub "www.${ProjectDomain}"

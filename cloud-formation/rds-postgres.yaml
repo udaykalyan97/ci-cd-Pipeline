@@ -1,0 +1,60 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: RDS PostgreSQL instance for different environments
+
+Parameters:
+  Environment:
+    Type: String
+    AllowedValues: [dev, staging, uat, prod]
+    Description: Deployment environment
+
+  DBUsername:
+    Type: String
+    Description: Master DB username
+    NoEcho: true
+
+  DBPassword:
+    Type: String
+    Description: Master DB password
+    NoEcho: true
+
+  VPCSecurityGroupId:
+    Type: AWS::EC2::SecurityGroup::Id
+    Description: Security group to allow access to the DB
+
+  DBSubnetGroupName:
+    Type: String
+    Description: Existing DB Subnet Group name (2+ subnets in different AZs)
+
+Resources:
+  PostgresDB:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      DBInstanceIdentifier: !Sub "${Environment}-postgres-db"
+      DBName: !Sub "${Environment}db"
+      Engine: postgres
+      EngineVersion: "15.3"
+      MasterUsername: !Ref DBUsername
+      MasterUserPassword: !Ref DBPassword
+      DBInstanceClass: db.t3.micro
+      AllocatedStorage: 20
+      MaxAllocatedStorage: 100
+      StorageType: gp2
+      VPCSecurityGroups:
+        - !Ref VPCSecurityGroupId
+      DBSubnetGroupName: !Ref DBSubnetGroupName
+      MultiAZ: false
+      PubliclyAccessible: false
+      BackupRetentionPeriod: 7
+      DeletionProtection: false
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+
+Outputs:
+  RDSInstanceEndpoint:
+    Description: The endpoint address of the PostgreSQL instance
+    Value: !GetAtt PostgresDB.Endpoint.Address
+
+  RDSInstanceARN:
+    Description: ARN of the RDS PostgreSQL instance
+    Value: !GetAtt PostgresDB.Arn

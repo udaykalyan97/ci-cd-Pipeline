@@ -1,0 +1,60 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: CloudFront distribution for dev, staging, uat, and prod environments.
+
+Parameters:
+  Environment:
+    Type: String
+    AllowedValues:
+      - dev
+      - staging
+      - uat
+      - prod
+    Description: The environment for the CloudFront distribution.
+
+Resources:
+  CloudFrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        CallerReference: !Sub '${AWS::StackName}-${Environment}'
+        Origins:
+          - Id: S3Origin
+            DomainName: !Sub 'hosted-bucket.s3.amazonaws.com'
+            S3OriginConfig:
+              OriginAccessIdentity: ''
+        Enabled: 'true'
+        DefaultRootObject: index.html
+        DefaultCacheBehavior:
+          TargetOriginId: S3Origin
+          ViewerProtocolPolicy: redirect-to-https
+          AllowedMethods:
+            Quantity: 2
+            Items:
+              - GET
+              - HEAD
+          CachedMethods:
+            Quantity: 2
+            Items:
+              - GET
+              - HEAD
+          Compress: 'true'
+        ViewerCertificate:
+          CloudFrontDefaultCertificate: 'true'
+        PriceClass: PriceClass_100 # For cost control (use PriceClass_200 or PriceClass_All for global coverage)
+        HttpVersion: http2
+        Restrictions:
+          GeoRestriction:
+            RestrictionType: none
+            Quantity: 0
+        CustomErrorResponses:
+          Quantity: 1
+          Items:
+            - ErrorCode: 404
+              ResponseCode: 200
+              ResponsePagePath: /index.html
+              ErrorCachingMinTTL: 300
+
+Outputs:
+  CloudFrontURL:
+    Description: URL of the CloudFront Distribution
+    Value: !Sub 'https://${CloudFrontDistribution.DomainName}'

@@ -14,7 +14,7 @@ echo "✅ AWS infrastructure created successfully."
 
 # === Step 2: Create Azure DevOps Pipeline ===
 echo "🔧 Running Azure DevOps pipeline creation script..."
-python3 create_azure_pipeline.py
+python3 create-azure-pipeline.py
 
 echo "✅ Azure DevOps pipeline created successfully."
 

@@ -1,0 +1,56 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Lambda function for backend processing in various environments.
+
+Parameters:
+  Environment:
+    Type: String
+    AllowedValues: [dev, staging, uat, prod]
+    Description: Deployment environment name
+
+  LambdaS3Bucket:
+    Type: String
+    Description: S3 bucket where Lambda code is uploaded
+
+  LambdaS3Key:
+    Type: String
+    Description: S3 key path to the Lambda zip file
+
+Resources:
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${Environment}-lambda-execution-role"
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+  BackendLambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub "${Environment}-backend-handler"
+      Handler: index.handler
+      Runtime: nodejs18.x
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Code:
+        S3Bucket: !Ref LambdaS3Bucket
+        S3Key: !Ref LambdaS3Key
+      MemorySize: 128
+      Timeout: 10
+      Environment:
+        Variables:
+          STAGE: !Ref Environment
+
+Outputs:
+  LambdaFunctionName:
+    Description: Lambda function name
+    Value: !Ref BackendLambdaFunction
+
+  LambdaFunctionArn:
+    Description: Lambda function ARN
+    Value: !GetAtt BackendLambdaFunction.Arn
